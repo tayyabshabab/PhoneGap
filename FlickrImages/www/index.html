@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta name="HandheldFriendly" content="true" />
+    <title>Flick Images</title>
+    <script src="js/phonegap-1.3.0.js"></script>
+    <script src="js/jquery.js"></script>
+    
+    <link rel="stylesheet"  href="css/jquery.mobile-1.0.min.css" />
+	<link rel="stylesheet" href="css/jqm-docs.css"/>
+	<!--<script src="../../../experiments/themeswitcher/jquery.mobile.themeswitcher.js"></script>-->
+	<script src="js/jqm-docs.js"></script>
+    <script src="js/jquery-ui-1.8.16.custom.min.js"></script>
+    <script src="js/jquery.mobile-1.0.js"></script>
+    <!--<script src="jquery.mobile-1.0.js"></script>-->
+    <script>
+		page=1;
+		function searchImages(transition,newSearch){
+			if (transition=='no')
+				var trans='no';
+			else
+				var trans='yes';
+				
+			if (newSearch=='yes')	$('#imgs').html('');
+			var f=document.frm;
+			var apiKey='abe80c4a4fc21267d997b70e67591328';
+			var numOfImgs=6;
+			//var queryText=f.title.value;
+			var allInputs = $(":input");
+			var queryText=allInputs[0].value;
+			//var jsonURL="http://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=" + apiKey + "&tags="+ queryText + "&format=json&per_page=" + numOfImgs + "&page="+ page;
+			var jsonURL="http://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=abe80c4a4fc21267d997b70e67591328&user_id=&tags="+queryText+"&per_page="+numOfImgs+"&page="+page+"&format=json&nojsoncallback=1";
+			$.get(jsonURL,function(data){
+				//alert(data.photos.page);
+				//$.parseJSON(data);
+                //data = data.replace('jsonFlickrApi(','');
+                //data = data.substring(0,data.length-1);
+
+                //var pics = jQuery.parseJSON(data);
+				var pics=data;
+				//alert(pics);
+                var add='<ul class="ui-listview" data-role="listview">';
+                for(var i=0;i<pics.photos.photo.length;i++){
+                    id = pics.photos.photo[i].id;
+                    farm_id = pics.photos.photo[i].farm;
+                    server_id = pics.photos.photo[i].server;
+                    secret = pics.photos.photo[i].secret;
+                    caption = pics.photos.photo[i].title;
+                    url="http://farm"+farm_id+".static.flickr.com/"+server_id+"/"+id+"_"+secret+"_z.jpg";
+                    thumb_url="http://farm"+farm_id+".static.flickr.com/"+server_id+"/"+id+"_"+secret+"_s.jpg";
+                    //add+="<img src='"+thumb_url+"' />";
+					add+='<li class="ui-btn ui-btn-icon-right ui-li-has-arrow ui-li ui-li-has-thumb ui-btn-up-c" data-theme="c"><div aria-hidden="true" class="ui-btn-inner ui-li"><div class="ui-btn-text"><a class="ui-link-inherit" href="'+url+'"><img class="ui-li-thumb" src="'+thumb_url+'"><p class="ui-li-desc">'+caption+'</p></a></div><span class="ui-icon ui-icon-arrow-r ui-icon-shadow"></span></div></li>';
+                }
+				add+='</ul>';
+				$('#imgs').append(add);
+				if (trans=='yes'){
+					$('#tbl').hide('slide','','slow',show_img);
+				}
+				page++;
+				
+            })
+		}
+		function show_frm(){
+			$('#imgs_div').hide('slide','','slow',show);
+		}
+		function show_img(){
+			$('#imgs_div').show();
+		}
+		function show(){
+			$('#tbl').show();
+		}
+	</script>
+    <style>
+		/*#tbl{
+			text-align:center;
+		}
+		#tbl input{
+			width:200px;
+			border-color:#999;
+			border-radius:5px;
+			-moz-border-radius:5px;
+			-webkit-border-radius:5px;
+			-o-border-radius:5px;
+		}
+		*/
+		.ui-footer{
+			display:none;
+		}
+		/*#imgs img{
+			padding:5px;
+			border:1px solid #999;
+			margin:3px;
+		}*/
+		#imgs{text-align:center}
+		#title{
+			background-color: #5895C0;
+			text-align:center;
+			background: -moz-radial-gradient(circle, #1a82f7, #2F2727);
+			background: -webkit-radial-gradient(circle, #1a82f7, #2F2727);
+			background: -ms-radial-gradient(circle, #1a82f7, #2F2727);
+			background: -o-radial-gradient(circle, #1a82f7, #2F2727);
+			padding:10px;
+			color:white;
+			font-size:20px;
+		}
+		hr{
+			margin:0 0 20px 0;
+		}
+		#tbl{
+			margin-top:10px;
+		}
+		#imgs_div{
+			display:none;
+		}
+	</style>
+</head>
+<body>
+	<div id="title">Photo Search</div>
+    <hr />
+    <table width="98%" id="tbl" align="center">
+        <form name="frm" method="post">
+        	<tr><td><label data-theme="b">Enter Keywords</label></td></tr>
+            <tr><td id="src"><input type="search" name="title" data-theme="b" /></td></tr>
+            <tr><td><input type="button" onClick="searchImages('yes','yes');" value="Search" data-theme="b" /></td></tr>
+        </form>
+    </table>
+    <div id="imgs_div">
+        <div id="again_btn" align="center"><input type="button" value="Search Again" onClick="show_frm()" data-theme="b" /></div>
+        <div id="imgs" align="center"></div>
+        <div id="more"><input type="button" value="More" onClick="searchImages('no')" data-theme="b" /></div>
+    </div>
+</body>
+</html>
